@@ -24,7 +24,9 @@ class AutosaveWindow:
         pass
 
     def on_focus_out_event(self, widget, focus):
-        gedit.commands.save_all_documents(self.window)
+        for doc in self.window.get_unsaved_documents():
+            doc.save(0)
+        #gedit.commands.save_all_documents(self.window)   
 
 
 class AutosavePlugin(gedit.Plugin):
