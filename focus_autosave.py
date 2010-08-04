@@ -1,4 +1,4 @@
-#!/usr/bin/python 
+#!/usr/bin/python
 # -*- coding: utf-8 -*-
 #
 # Save document when losing focus.
@@ -6,6 +6,7 @@
 
 
 import gedit
+import tempfile
 
 class AutosaveWindow:
     def __init__(self, plugin, window):
@@ -20,13 +21,18 @@ class AutosaveWindow:
 
     def update_ui(self):
         # Called whenever the window has been updated (active tab
-        # changed, etc.) 
+        # changed, etc.)
         pass
 
     def on_focus_out_event(self, widget, focus):
         for doc in self.window.get_unsaved_documents():
+            uri = doc.get_uri()
+            print uri
+            if uri is None:
+                temp_fd, temp_path = tempfile.mkstemp(".txt","gedit-unsaved-")
+                print 'temp:', temp_path
+                doc.save_as("file://" + temp_path, doc.get_encoding(),0)
             doc.save(0)
-        #gedit.commands.save_all_documents(self.window)   
 
 
 class AutosavePlugin(gedit.Plugin):
