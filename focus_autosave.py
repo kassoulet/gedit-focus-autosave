@@ -26,12 +26,11 @@ class AutosaveWindow:
 
     def on_focus_out_event(self, widget, focus):
         for doc in self.window.get_unsaved_documents():
+            if doc.is_untouched():
+                continue
             uri = doc.get_uri()
-            print uri
             if uri is None:
-                temp_fd, temp_path = tempfile.mkstemp(".txt","gedit-unsaved-")
-                print 'temp:', temp_path
-                doc.save_as("file://" + temp_path, doc.get_encoding(),0)
+                continue
             doc.save(0)
 
 
