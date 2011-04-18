@@ -1,4 +1,4 @@
 
 install::
-	-mkdir ~/.gnome2/gedit/plugins
-	cp focus-autosave.gedit-plugin focus_autosave.py ~/.gnome2/gedit/plugins
+	-mkdir ~/.local/share/gedit/plugins 
+	cp focus-autosave.gedit-plugin focus_autosave.py ~/.local/share/gedit/plugins

@@ -4,9 +4,7 @@
 # Save document when losing focus.
 # Gautier Portet <kassoulet gmail.com>
 
-
-import gedit
-import tempfile
+from gi.repository import GObject, Gtk, Gdk, Gedit
 
 class AutosaveWindow:
     def __init__(self, plugin, window):
@@ -28,24 +26,28 @@ class AutosaveWindow:
         for doc in self.window.get_unsaved_documents():
             if doc.is_untouched():
                 continue
-            uri = doc.get_uri()
-            if uri is None:
+            if doc.get_location() is None:
                 continue
             doc.save(0)
 
 
-class AutosavePlugin(gedit.Plugin):
+class FocusAutoSavePlugin(GObject.Object, Gedit.WindowActivatable):
+    __gtype_name__ = "FocusAutoSavePlugin"
+
+    window = GObject.property(type=Gedit.Window)
+
     def __init__(self):
-        gedit.Plugin.__init__(self)
+        GObject.Object.__init__(self)
         self.instances = {}
 
-    def activate(self, window):
-        self.instances[window] = AutosaveWindow(self, window)
+    def do_activate(self):
+        self.instances[self.window] = AutosaveWindow(self, self.window)
 
-    def deactivate(self, window):
-        self.instances[window].deactivate()
-        del self.instances[window]
+    def do_deactivate(self):
+        self.instances[self.window].deactivate()
+        del self.instances[self.window]
 
-    def update_ui(self, window):
-        self.instances[window].update_ui()
+    def do_update_state(self):
+        self.instances[self.window].update_ui()
+
 
