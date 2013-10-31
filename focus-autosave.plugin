@@ -1,10 +1,10 @@
 [Plugin]
-Loader=python
+Loader=python3
 Module=focus_autosave
 IAge=3
 Name=Focus Autosave
-Description=Save document when losing focus.
-Authors=Gautier Portet <kassoulet@gmail.com>
-Copyright=Copyright © 2009-2011 Gautier Portet <kassoulet@gmail.com>
+Description=Save all documents when losing focus.
+Authors=Gautier Portet <gautier@soundconverter.org>
+Copyright=Copyright © 2009-2013 Gautier Portet <gautier@soundconverter.org>
 Website=http://kassoulet.free.fr
-Version=3.0.1
+Version=3.0.2
