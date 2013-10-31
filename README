@@ -5,7 +5,7 @@ This is really a time saver when you are editing files and using
 a terminal for running something dependant on you edited files, 
 since you are not forced to press ctrl-s anymore.
 
-Install by copying the files into ~/.share/local/gedit/plugins
+Install by copying the files into ~/.local/share/gedit/plugins
 or just running "make install"
 
 by Gautier Portet <kassoulet@gmail.com>
