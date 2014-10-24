@@ -6,7 +6,15 @@
 
 from gi.repository import GObject, Gtk, Gdk, Gedit, Gio
 import datetime
+import os
 
+home = os.path.expanduser("~")
+dirname="/.gedit_unsaved/"
+
+def assure_path_exists(path):
+        dir = os.path.dirname(path)
+        if not os.path.exists(dir):
+                os.makedirs(dir)
 
 class FocusAutoSavePlugin(GObject.Object, Gedit.WindowActivatable):
     __gtype_name__ = "FocusAutoSavePlugin"
@@ -25,7 +33,8 @@ class FocusAutoSavePlugin(GObject.Object, Gedit.WindowActivatable):
             if doc.is_untitled():
                 # provide a default filename
                 now = datetime.datetime.now();
-                filename = now.strftime("/tmp/gedit.unsaved.%Y%m%d-%H%M%S.txt");
+                assure_path_exists(home + dirname)
+                filename = now.strftime(home + dirname + "%Y%m%d-%H%M%S.txt")
                 doc.set_location(Gio.file_parse_name(filename))
             # save the document
             Gedit.commands_save_document(self.window, doc)
