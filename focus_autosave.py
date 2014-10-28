@@ -26,7 +26,7 @@ class FocusAutoSavePlugin(GObject.Object, Gedit.WindowActivatable):
 
     def on_focus_out_event(self, widget, focus):
 
-        for doc in self.window.get_unsaved_documents():
+        for n, doc in enumerate(self.window.get_unsaved_documents()):
             if doc.is_untouched():
                 # nothing to do
                 continue
@@ -34,7 +34,7 @@ class FocusAutoSavePlugin(GObject.Object, Gedit.WindowActivatable):
                 # provide a default filename
                 now = datetime.datetime.now();
                 assure_path_exists(home + dirname)
-                filename = now.strftime(home + dirname + "%Y%m%d-%H%M%S.txt")
+                filename = now.strftime(home + dirname + "%Y%m%d-%H%M%S-%%d.txt") % n;
                 doc.set_location(Gio.file_parse_name(filename))
             # save the document
             Gedit.commands_save_document(self.window, doc)
