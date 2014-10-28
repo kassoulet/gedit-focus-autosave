@@ -8,33 +8,33 @@ from gi.repository import GObject, Gtk, Gdk, Gedit, Gio
 import datetime
 import os
 
-home = os.path.expanduser("~")
-dirname="/.gedit_unsaved/"
+# You can change here the default folder for unsaved files.
+dirname = os.path.expanduser("~/.gedit_unsaved/")
+
 
 def assure_path_exists(path):
-        dir = os.path.dirname(path)
-        if not os.path.exists(dir):
-                os.makedirs(dir)
+    dir = os.path.dirname(path)
+    if not os.path.exists(dir):
+            os.makedirs(dir)
+
 
 class FocusAutoSavePlugin(GObject.Object, Gedit.WindowActivatable):
     __gtype_name__ = "FocusAutoSavePlugin"
-
     window = GObject.property(type=Gedit.Window)
 
     def __init__(self):
         GObject.Object.__init__(self)
 
     def on_focus_out_event(self, widget, focus):
-
         for n, doc in enumerate(self.window.get_unsaved_documents()):
             if doc.is_untouched():
                 # nothing to do
                 continue
             if doc.is_untitled():
                 # provide a default filename
-                now = datetime.datetime.now();
-                assure_path_exists(home + dirname)
-                filename = now.strftime(home + dirname + "%Y%m%d-%H%M%S-%%d.txt") % n;
+                now = datetime.datetime.now()
+                assure_path_exists(dirname)
+                filename = now.strftime(dirname + "%Y%m%d-%H%M%S-%%d.txt") % (n + 1)
                 doc.set_location(Gio.file_parse_name(filename))
             # save the document
             Gedit.commands_save_document(self.window, doc)
