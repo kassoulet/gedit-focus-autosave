@@ -38,7 +38,7 @@ class FocusAutoSavePlugin(GObject.Object, Gedit.WindowActivatable):
                 now = datetime.datetime.now()
                 assure_path_exists(dirname)
                 filename = now.strftime(dirname + "%Y%m%d-%H%M%S-%%d.txt") % (n + 1)
-                doc.set_location(Gio.file_parse_name(filename))
+                doc.get_file().set_location(Gio.file_parse_name(filename))
             # save the document
             Gedit.commands_save_document(self.window, doc)
 
