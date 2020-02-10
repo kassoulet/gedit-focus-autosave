@@ -30,6 +30,9 @@ class FocusAutoSavePlugin(GObject.Object, Gedit.WindowActivatable):
             if doc.is_untouched():
                 # nothing to do
                 continue
+            if doc.get_file().is_readonly():
+                # skip read-only files
+                continue
             if doc.is_untitled():
                 # provide a default filename
                 now = datetime.datetime.now()
