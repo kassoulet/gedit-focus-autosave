@@ -4,7 +4,7 @@
 # Save document when losing focus.
 # Gautier Portet <kassoulet gmail.com>
 
-from gi.repository import GObject, Gtk, Gdk, Gedit, Gio
+from gi.repository import GObject, Gedit, Gio
 import datetime
 import os
 
@@ -33,7 +33,7 @@ class FocusAutoSavePlugin(GObject.Object, Gedit.WindowActivatable):
             if doc.get_file().is_readonly():
                 # skip read-only files
                 continue
-            if doc.is_untitled():
+            if doc.get_file().get_location() is None:
                 # provide a default filename
                 now = datetime.datetime.now()
                 assure_path_exists(dirname)
