@@ -5,6 +5,6 @@ IAge=3
 Name=Focus Autosave
 Description=Save all documents when losing focus.
 Authors=Gautier Portet <gautier@soundconverter.org>
-Copyright=Copyright © 2009-2013 Gautier Portet <gautier@soundconverter.org>
+Copyright=Copyright © 2009-2023 Gautier Portet <gautier@soundconverter.org>
 Website=http://kassoulet.free.fr
 Version=3.0.2

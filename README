@@ -2,12 +2,12 @@ gedit-focus-autosave is a small plugin for gedit, to save documents when the
 window loose focus.
 
 This is really a time saver when you are editing files and using
-a terminal for running something dependant on you edited files, 
+a terminal for running something dependant on you edited files,
 since you are not forced to press ctrl-s anymore.
 
 Install by copying the files into ~/.local/share/gedit/plugins
 or just running "make install"
 
 by Gautier Portet <kassoulet@gmail.com>
-Copyright © 2009-2011 Gautier Portet <kassoulet@gmail.com>
+Copyright © 2009-2023 Gautier Portet <kassoulet@gmail.com>
 http://kassoulet.free.fr
