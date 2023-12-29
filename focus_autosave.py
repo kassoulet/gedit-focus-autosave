@@ -15,7 +15,7 @@ from pathlib import Path
 gi.require_version("Gtk", "3.0")
 
 # region ############### CONSTANTs #################################
-DEFAULT_TEMP_PATH = "/tmp/.gedit_unsaved"
+DEFAULT_TEMP_PATH = Path("~/.gedit_unsaved").expanduser()
 
 GEDIT_CONFIG_DIR = Path(GLib.get_user_config_dir())/"gedit"
 COFING_FILE = Path(GEDIT_CONFIG_DIR)/"focus_autosave_settings.json"
@@ -28,7 +28,7 @@ except (FileNotFoundError, json.JSONDecodeError):
     FA_CONFIG = dict(temp_path=None)
 
 if FA_CONFIG["temp_path"] is not None:
-    TEMP_DIR = Path(FA_CONFIG.get("temp_path", DEFAULT_TEMP_PATH)).expanduser()
+    TEMP_DIR = Path(FA_CONFIG["temp_path"]).expanduser()
     Path(TEMP_DIR).mkdir(parents=True, exist_ok=True)
 
 SOURCE_DIR = Path(__file__).parent.resolve()
@@ -150,7 +150,7 @@ class Handler:
             self.main_window.folder.set_sensitive(True)
             if (FA_CONFIG["temp_path"]) is None:
                 FA_CONFIG["temp_path"] = DEFAULT_TEMP_PATH
-                self.main_window.folder.set_current_folder(FA_CONFIG["temp_path"])
+                self.main_window.folder.set_current_folder(str(FA_CONFIG["temp_path"]))
         else:
             self.main_window.folder.unselect_all()
             self.main_window.folder.set_sensitive(False)
