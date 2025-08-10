@@ -12,7 +12,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [ubuntu-latest, fedora-latest]
+        os: [ubuntu-latest, ubuntu-rolling, fedora-latest]
 
     steps:
       - name: Checkout repo
