@@ -1,0 +1,90 @@
+name: Gedit Autosave Integration Test
+
+on:
+  push:
+  pull_request:
+  schedule:
+    - cron: "0 6 * * 0" # Weekly run to catch regressions
+
+jobs:
+  test:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, fedora-latest]
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Install dependencies (Ubuntu)
+        if: runner.os == 'Linux' && startsWith(matrix.os, 'ubuntu')
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y \
+            gedit \
+            python3-gi \
+            gir1.2-gedit-3.0 \
+            gir1.2-gtk-3.0 \
+            xvfb \
+            xdotool \
+            imagemagick
+
+      - name: Install dependencies (Fedora)
+        if: runner.os == 'Linux' && startsWith(matrix.os, 'fedora')
+        run: |
+          sudo dnf install -y \
+            gedit \
+            python3-gobject \
+            gedit-devel \
+            gtk3-devel \
+            xorg-x11-server-Xvfb \
+            xdotool \
+            ImageMagick
+
+      - name: Install plugin
+        run: |
+          mkdir -p ~/.local/share/gedit/plugins
+          cp -r gedit-focus-autosave ~/.local/share/gedit/plugins/
+
+      - name: Run integration test
+        run: |
+          set -e
+          export DISPLAY=:99
+          Xvfb :99 -screen 0 1024x768x24 &
+
+          # Create a test file
+          echo "initial" > test.txt
+
+          # Start gedit with the test file
+          gedit test.txt &
+          sleep 3  # Give it time to start
+
+          # Type new text without manual save
+          xdotool type " - autosave check"
+
+          # Simulate focus change (minimize window)
+          xdotool search --onlyvisible --name "gedit" windowminimize
+
+          # Give plugin time to autosave
+          sleep 2
+
+          # Verify autosave worked
+          grep "autosave check" test.txt
+
+      - name: Capture screenshot
+        run: |
+          export DISPLAY=:99
+          TS=$(date +"%Y-%m-%d_%H-%M-%S")
+          import -window root "screenshot_${TS}.png" || true
+          echo "SCREENSHOT_FILE=screenshot_${TS}.png" >> $GITHUB_ENV
+
+      - name: Upload screenshot
+        uses: actions/upload-artifact@v4
+        with:
+          name: gedit-screenshot-${{ matrix.os }}
+          path: ${{ env.SCREENSHOT_FILE }}
+
+      - name: Show test file content
+        run: cat test.txt
