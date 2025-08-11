@@ -1,7 +1,8 @@
-
 install::
-	@mkdir -p ~/.local/share/gedit/plugins
-	@cp focus_autosave{.py,_config.glade} focus-autosave.plugin ~/.local/share/gedit/plugins -v
+	@mkdir -p ~/.local/share/gedit/plugins/gedit-focus-autosave
+	@cp gedit-focus-autosave/* ~/.local/share/gedit/plugins/gedit-focus-autosave/ -v
 
 uninstall:
-	@rm -fv  ~/.local/share/gedit/plugins/focus{-,_}autosave{_config,}.{plugin,py,glade}
+	@rm -rfv ~/.local/share/gedit/plugins/gedit-focus-autosave
+
+.PHONY: install uninstall
