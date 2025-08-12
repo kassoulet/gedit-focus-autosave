@@ -5,7 +5,6 @@
 # Gautier Portet <kassoulet gmail.com>
 
 import datetime
-import json
 import gi
 
 from gi.repository import GObject, Gedit, Gio, Gdk, Gtk, PeasGtk, GLib
@@ -16,21 +15,7 @@ gi.require_version("Gtk", "3.0")
 
 # region ############### CONSTANTs #################################
 DEFAULT_TEMP_PATH = Path("~/.gedit_unsaved").expanduser()
-
-GEDIT_CONFIG_DIR = Path(GLib.get_user_config_dir()) / "gedit"
-COFING_FILE = Path(GEDIT_CONFIG_DIR) / "focus_autosave_settings.json"
-
-try:
-    with open(COFING_FILE, encoding="utf-8") as conf:
-        data = conf.read()
-    FA_CONFIG = json.loads(data)
-except (FileNotFoundError, json.JSONDecodeError):
-    FA_CONFIG = dict(temp_path=None)
-
-if FA_CONFIG["temp_path"] is not None:
-    TEMP_DIR = Path(FA_CONFIG["temp_path"]).expanduser()
-    Path(TEMP_DIR).mkdir(parents=True, exist_ok=True)
-
+SETTINGS = Gio.Settings.new("org.gnome.gedit.plugins.focus-autosave")
 SOURCE_DIR = Path(__file__).parent.resolve()
 # endregion ############### CONSTANTs ###############################
 
@@ -93,6 +78,8 @@ class FocusAutoSavePlugin(
             # skip to user specified file name
             self.other_action = False
             return
+        now = datetime.datetime.now()
+        temp_path = SETTINGS.get_string("temp-path")
         for n, doc in enumerate(self.window.get_unsaved_documents()):
             if doc.is_untouched():
                 # nothing to do
@@ -100,22 +87,22 @@ class FocusAutoSavePlugin(
             if doc.get_file().is_readonly():
                 # skip read-only files
                 continue
-            if (
-                doc.get_file().get_location() is None
-                and FA_CONFIG["temp_path"] is not None
-            ):
+
+            if doc.get_file().get_location() is None and (temp_path) is not None:
                 # provide a default filename
-                now = datetime.datetime.now()
-                Path(FA_CONFIG["temp_path"]).mkdir(parents=True, exist_ok=True)
                 filename = str(
-                    Path(FA_CONFIG["temp_path"])
+                    Path(temp_path).expanduser()
                     / now.strftime(f"%Y%m%d-%H%M%S-{n+1}.txt")
                 )
                 doc.get_file().set_location(Gio.file_parse_name(filename))
-            else:
-                continue
-            # save the document
-            Gedit.commands_save_document(self.window, doc)
+
+            if doc.get_file().get_location():
+                # save the document
+                Path(temp_path).expanduser().mkdir(parents=True, exist_ok=True)
+                assert (
+                    Path(temp_path).expanduser().is_dir()
+                ), f"{temp_path} is not a directory"
+                Gedit.commands_save_document(self.window, doc)
 
     def do_create_configure_widget(self):
         # Just return your box, PeasGtk will automatically pack it into a box and show it.
@@ -127,14 +114,14 @@ class FocusAutoSavePlugin(
         self.untitled_savecheck = builder.get_object("untitled_savecheck")
         self.folder = builder.get_object("folder")
 
-        if FA_CONFIG["temp_path"] is None:
+        if (temp_path := SETTINGS.get_string("temp-path")) is None or temp_path == "":
             self.folder.unselect_all()
             self.untitled_savecheck.set_active(False)
             self.folder.set_sensitive(False)
         else:
             self.untitled_savecheck.set_active(True)
             self.folder.set_sensitive(True)
-            self.folder.set_current_folder(FA_CONFIG["temp_path"])
+            self.folder.set_current_folder(temp_path)
 
         # region Signals' binding to the handlers ##############################
         window.connect("destroy", Handler(self).on_window_destroy)
@@ -156,27 +143,24 @@ class Handler:
             self.main_window.untitled_savecheck.get_active()
             and (folder := self.main_window.folder.get_filename()) is not None
         ):
-            FA_CONFIG["temp_path"] = folder
+            SETTINGS.set_string("temp-path", folder)
         else:
-            FA_CONFIG["temp_path"] = None
-
-        with open(COFING_FILE, mode="w", encoding="utf-8") as conf:
-            json.dump(FA_CONFIG, conf)
+            SETTINGS.set_string("temp-path", "")
 
     def on_selection_changed(self, file_chooser):
         folder = file_chooser.get_filename()
         if folder and self.main_window.untitled_savecheck.get_active():
-            FA_CONFIG["temp_path"] = str(Path(folder))
+            SETTINGS.set_string("temp-path", str(Path(folder)))
         else:
-            FA_CONFIG["temp_path"] = None
+            SETTINGS.set_string("temp-path", "")
 
     def on_untitled_savecheck_toggled(self, toggle_button):
         if toggle_button.get_active():
             self.main_window.folder.set_sensitive(True)
-            if (FA_CONFIG["temp_path"]) is None:
-                FA_CONFIG["temp_path"] = DEFAULT_TEMP_PATH
-                self.main_window.folder.set_current_folder(str(FA_CONFIG["temp_path"]))
+            if (temp_path := SETTINGS.get_string("temp-path")) is None:
+                SETTINGS.set_string("temp-path", str(DEFAULT_TEMP_PATH))
+                self.main_window.folder.set_current_folder(str(DEFAULT_TEMP_PATH))
         else:
             self.main_window.folder.unselect_all()
             self.main_window.folder.set_sensitive(False)
-            FA_CONFIG["temp_path"] = None
+            SETTINGS.set_string("temp-path", "")
