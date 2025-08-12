@@ -8,7 +8,8 @@ Xvfb :99 -screen 0 1024x768x24 &
 sleep 1
 
 # Create output directory (bind-mounted to host)
-mkdir -p /output
+# OUTPUT_DIR="$(pwd)/output"
+# mkdir -p "${OUTPUT_DIR}"
 
 # Create a test file
 echo "initial" > test.txt
@@ -28,7 +29,7 @@ test() {
     file_pattern=$2 # Output file pattern
 
     # Run gedit and redirect logs
-    G_MESSAGES_DEBUG=all gedit $filename 2>&1 | tee /output/gedit_${TS}.log &
+    G_MESSAGES_DEBUG=all gedit $filename &
 
     sleep 3  # Give it time to start
 
@@ -36,7 +37,7 @@ test() {
     xdotool type "autosave check - "
 
     # Capture screenshot
-    import -window root "/output/screenshot_${TS}_edited.png" || true
+    # import -window root "${OUTPUT_DIR}/screenshot_${TS}_edited.png" || true
 
     # Simulate focus change
     WID=$(xdotool search --onlyvisible --name "gedit" | head -1)
