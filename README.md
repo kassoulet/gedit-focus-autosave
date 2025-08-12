@@ -1,7 +1,7 @@
 [![Gedit Autosave Integration Test](https://github.com/kassoulet/gedit-focus-autosave/actions/workflows/integration-tests.yaml/badge.svg)](https://github.com/kassoulet/gedit-focus-autosave/actions/workflows/integration-tests.yaml)
 
 gedit-focus-autosave is a small plugin for gedit, to save documents when the
-window loose focus.
+window looses focus.
 
 This is really a time saver when you are editing files and using
 a terminal for running something dependant on you edited files,
