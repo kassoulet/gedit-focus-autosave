@@ -1,0 +1,27 @@
+FROM fedora:latest
+
+# Install dependencies
+RUN dnf install -y \
+    gedit \
+    python3-gobject \
+    gedit-devel \
+    gtk3-devel \
+    xorg-x11-server-Xvfb \
+    xdotool \
+    ImageMagick \
+    dbus-x11 \
+ && dnf clean all
+
+# Install plugin into Gedit plugins dir
+COPY . /root/gedit-focus-autosave/
+RUN cd /root/gedit-focus-autosave && make install
+
+# Copy test script
+COPY integration-test.sh /usr/local/bin/integration-test.sh
+RUN chmod +x /usr/local/bin/integration-test.sh
+
+# Make an output folder
+RUN mkdir -p /output
+
+# Default command runs the test
+CMD ["bash", "/usr/local/bin/integration-test.sh"]

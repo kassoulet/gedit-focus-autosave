@@ -1,0 +1,20 @@
+FROM ubuntu:rolling
+
+# Install dependencies
+RUN sudo apt-get install -y gedit python3-gi gir1.2-gtk-3.0 xvfb xdotool imagemagick dbus-x11 || true
+RUN sudo apt-get install -y gir1.2-gedit-3.0 || true
+RUN rm -rf /var/lib/apt/lists/*
+
+# Install plugin into Gedit plugins dir
+COPY . /root/gedit-focus-autosave/
+RUN cd /root/gedit-focus-autosave && make install
+
+# Copy test script
+COPY integration-test.sh /usr/local/bin/integration-test.sh
+RUN chmod +x /usr/local/bin/integration-test.sh
+
+# Make an output folder
+RUN mkdir -p /output
+
+# Default command runs the test
+CMD ["bash", "/usr/local/bin/integration-test.sh"]

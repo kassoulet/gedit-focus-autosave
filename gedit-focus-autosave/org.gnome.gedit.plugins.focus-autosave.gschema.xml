@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schemalist>
+  <schema id="org.gnome.gedit.plugins.focus-autosave" path="/org/gnome/gedit/plugins/focus-autosave/">
+    <key name="temp-path" type="s">
+      <default>"~/.gedit_unsaved"</default>
+      <summary>The path to save temporary files.</summary>
+    </key>
+  </schema>
+</schemalist>
