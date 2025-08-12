@@ -7,7 +7,7 @@
 import datetime
 import gi
 
-from gi.repository import GObject, Gedit, Gio, Gdk, Gtk, PeasGtk, GLib
+from gi.repository import GObject, Gedit, Gio, Gdk, Gtk
 
 from pathlib import Path
 
@@ -21,7 +21,8 @@ SOURCE_DIR = Path(__file__).parent.resolve()
 
 
 class FocusAutoSavePlugin(
-    GObject.Object, Gedit.WindowActivatable, PeasGtk.Configurable
+    GObject.Object,
+    Gedit.WindowActivatable,
 ):
     __gtype_name__ = "FocusAutoSavePlugin"
     window = GObject.property(type=Gedit.Window)
