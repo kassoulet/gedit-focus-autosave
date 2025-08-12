@@ -36,12 +36,12 @@ fi
 if ! gsettings get org.gnome.gedit.plugins.focus-autosave temp-path | grep -q "$HOME/.gedit_unsaved"; then
     echo "Incorrect default temp path"
     exit 1
-fi
+}
 
 if [ -e "$HOME/.gedit_unsaved" ]; then
     echo "$HOME/.gedit_unsaved must not exist"
     exit 1
-fi
+}
 
 test_autosave() {
     local filename=$1
