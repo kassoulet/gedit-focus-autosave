@@ -17,7 +17,7 @@ COPY . /root/gedit-focus-autosave/
 RUN cd /root/gedit-focus-autosave && make install
 
 # Copy test script
-COPY integration-test.sh /usr/local/bin/integration-test.sh
+COPY .github/workflows/integration-test.sh /usr/local/bin/integration-test.sh
 RUN chmod +x /usr/local/bin/integration-test.sh
 
 # Make an output folder
