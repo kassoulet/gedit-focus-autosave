@@ -8,56 +8,26 @@ on:
 
 jobs:
   test:
-    runs-on: ${{ matrix.os }}
+    runs-on: ubuntu-latest
     strategy:
       fail-fast: false
       matrix:
-        os: [ubuntu-latest, ubuntu-rolling, fedora-latest]
+        include:
+          - os: ubuntu-latest
+            containerfile: Containerfile.latest.ubuntu
+          - os: ubuntu-rolling
+            containerfile: Containerfile.rolling.ubuntu
+          - os: fedora-latest
+            containerfile: Containerfile.fedora
 
     steps:
       - name: Checkout repo
         uses: actions/checkout@v4
 
-      - name: Install dependencies (Ubuntu)
-        if: runner.os == 'Linux' && startsWith(matrix.os, 'ubuntu')
+      - name: Build container
         run: |
-          sudo apt-get update
-          sudo apt-get install -y gedit python3-gi gir1.2-gtk-3.0 xvfb xdotool imagemagick dbus-x11 make
-          sed -i 's/@sudo //g' makefile
-
-      - name: Install dependencies (Fedora)
-        if: runner.os == 'Linux' && startsWith(matrix.os, 'fedora')
-        run: |
-          sudo dnf install -y \
-            gedit \
-            python3-gobject \
-            gedit-devel \
-            gtk3-devel \
-            xorg-x11-server-Xvfb \
-            xdotool \
-            ImageMagick \
-            dbus-x11
-
-      - name: Install plugin
-        run: |
-          make install
+          docker build -t gedit-focus-autosave:${{ matrix.os }} -f .github/workflows/${{ matrix.containerfile }} .
 
       - name: Run integration test
         run: |
-          bash .github/workflows/integration-test.sh
-
-      - name: Capture screenshot
-        run: |
-          export DISPLAY=:99
-          TS=$(date +"%Y-%m-%d_%H-%M-%S")
-          import -window root "screenshot_${TS}.png" || true
-          echo "SCREENSHOT_FILE=screenshot_${TS}.png" >> $GITHUB_ENV
-
-      - name: Upload screenshot
-        uses: actions/upload-artifact@v4
-        with:
-          name: gedit-focus-autosave-screenshot-${{ matrix.os }}
-          path: ${{ env.SCREENSHOT_FILE }}
-
-      - name: Show test file content
-        run: cat test.txt
+          docker run gedit-focus-autosave:${{ matrix.os }}
