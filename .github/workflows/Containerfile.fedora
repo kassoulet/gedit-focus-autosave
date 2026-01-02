@@ -10,6 +10,7 @@ RUN dnf install -y \
     xdotool \
     ImageMagick \
     dbus-x11 \
+    make \
  && dnf clean all
 
 # Install plugin into Gedit plugins dir
