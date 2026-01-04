@@ -10,7 +10,8 @@ RUN dnf install -y \
     xdotool \
     ImageMagick \
     dbus-x11 \
- && dnf clean all
+    make \
+    && dnf clean all
 
 # Install plugin into Gedit plugins dir
 COPY . /root/gedit-focus-autosave/
